@@ -1,9 +1,9 @@
+flask
+python-dotenv
+waitress
+requests
 langchain
 openai
 faiss-cpu
 PyDictionary
 tqdm
-flask
-python-dotenv
-waitress
-
