@@ -1,0 +1,18 @@
+### Document 1: Company Overview
+EcoSpark Solutions is a green-tech startup that designs, manufactures, and sells clean energy products. We focus on solar energy systems, smart inverters, and real-time power usage monitors. Our mission is to accelerate the transition to sustainable energy.
+
+### Document 2: Product Specifications
+The EcoSpark 3000 Inverter supports 3kW capacity, dual-mode operation (grid-tied and off-grid), and remote access via the EcoSpark mobile app. Smart Meters can track energy usage down to the minute and are compatible with Alexa and Google Home.
+
+### Document 3: FAQs
+Q: How long is the warranty for EcoSpark products?  
+A: All EcoSpark products come with a standard 5-year warranty.  
+
+Q: Can I monitor my solar panels remotely?  
+A: Yes, you can use the EcoSpark App available on iOS and Android for remote monitoring and analytics.
+
+### Document 4: Installation Instructions
+Solar panels should be mounted facing south with a tilt angle between 25 and 35 degrees for optimal exposure. Inverters must be installed in a shaded, well-ventilated area to prevent overheating.
+
+### Document 5: Maintenance Tips
+Solar panels should be cleaned every 2–3 months using water and a soft cloth. Avoid harsh chemicals or scrubbing tools. Check the inverter display weekly to ensure proper functioning and scan for any error codes.
