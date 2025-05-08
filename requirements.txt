@@ -4,3 +4,4 @@ faiss-cpu
 PyDictionary
 tqdm
 flask
+python-dotenv
