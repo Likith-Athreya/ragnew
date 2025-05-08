@@ -9,7 +9,7 @@ from waitress import serve
 load_dotenv()  # Load environment variables from the .env file
 
 # --------------------- Logging Setup ---------------------
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # --------------------- Hugging Face API Setup ---------------------
 def generate_text_with_hugging_face(prompt):
@@ -27,12 +27,13 @@ def generate_text_with_hugging_face(prompt):
     
     payload = {"inputs": prompt}
     
-    response = requests.post(API_URL, headers=headers, json=payload)
-    
-    if response.status_code == 200:
+    try:
+        response = requests.post(API_URL, headers=headers, json=payload)
+        response.raise_for_status()  # Will raise an exception for 4xx or 5xx status codes
         return response.json()  # Return the generated text from the model
-    else:
-        return f"Error {response.status_code}: {response.text}"
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error while calling Hugging Face API: {e}")
+        return f"Error while processing the request: {e}"
 
 # --------------------- Calculator Tool ---------------------
 def calculate(query):
@@ -44,6 +45,7 @@ def calculate(query):
         result = eval(expression, {"__builtins__": {}}, {})
         return f"The result is: {result}"
     except Exception as e:
+        logging.error(f"Error in calculation: {e}")
         return f"Error in calculation: {e}"
 
 # --------------------- Dictionary Tool ---------------------
@@ -60,6 +62,7 @@ def define(query):
         meaning = dictionary.get(word, "Definition not found.")
         return f"Definition of {word}:\n{meaning}"
     except Exception as e:
+        logging.error(f"Error in lookup: {e}")
         return f"Error in lookup: {e}"
 
 # --------------------- Agent Router ---------------------
@@ -79,8 +82,7 @@ def route_query(query):
     
     else:
         logging.info("Routing to Hugging Face API for text generation")
-        result = generate_text_with_hugging_face(query)
-        return result
+        return generate_text_with_hugging_face(query)
 
 # --------------------- Flask Setup ---------------------
 app = Flask(__name__)
@@ -97,6 +99,14 @@ def ask_question():
     response = route_query(query)
 
     return jsonify({"response": response})
+
+# --------------------- Ping Route (Health Check) ---------------------
+@app.route('/ping', methods=['GET'])
+def ping():
+    """
+    A simple health check endpoint to ensure the application is up and running.
+    """
+    return jsonify({"status": "ok"})
 
 # --------------------- Run the Flask App ---------------------
 if __name__ == '__main__':
