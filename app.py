@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import os
+from waitress import serve
 
 # --------------------- Load .env file ---------------------
 load_dotenv()  # Load environment variables from the .env file
@@ -15,29 +16,23 @@ def generate_text_with_hugging_face(prompt):
     """
     Function to generate text using Hugging Face API (GPT-2 model).
     """
-    # Fetching Hugging Face API Key from the environment variable
     api_key = os.getenv("HUGGING_FACE_API_KEY")
     
     if not api_key:
         raise ValueError("API key not found! Please set it in the .env file.")
     
-    # Hugging Face API URL (GPT-2 model or any other model you'd like to use)
     API_URL = "https://api-inference.huggingface.co/models/gpt2"
     
-    # Set headers with the API key
     headers = {"Authorization": f"Bearer {api_key}"}
     
-    # Set the prompt in the payload
     payload = {"inputs": prompt}
     
-    # Send a POST request to the API
     response = requests.post(API_URL, headers=headers, json=payload)
     
-    # Check if the response is successful
     if response.status_code == 200:
         return response.json()  # Return the generated text from the model
     else:
-        return f"Error {response.status_code}: {response.text}"  # Return the error message
+        return f"Error {response.status_code}: {response.text}"
 
 # --------------------- Calculator Tool ---------------------
 def calculate(query):
@@ -45,7 +40,6 @@ def calculate(query):
     A simple calculator to evaluate mathematical expressions in a query.
     """
     try:
-        # Extract expression from query (e.g., "calculate 2 + 2")
         expression = query.lower().replace("calculate", "").strip()
         result = eval(expression, {"__builtins__": {}}, {})
         return f"The result is: {result}"
@@ -59,7 +53,6 @@ def define(query):
     """
     try:
         word = query.lower().split("define")[-1].strip()
-        # Fetching definition from a simple placeholder dictionary
         dictionary = {
             "python": "A high-level programming language.",
             "ai": "Artificial Intelligence is the simulation of human intelligence in machines."
@@ -76,17 +69,14 @@ def route_query(query):
     """
     query_lower = query.lower()
     
-    # Routing to calculator if 'calculate' is in the query
     if "calculate" in query_lower:
         logging.info("Routing to Calculator Tool")
         return calculate(query)
     
-    # Routing to dictionary if 'define' is in the query
     elif "define" in query_lower:
         logging.info("Routing to Dictionary Tool")
         return define(query)
     
-    # Otherwise, routing to Hugging Face API for text generation
     else:
         logging.info("Routing to Hugging Face API for text generation")
         result = generate_text_with_hugging_face(query)
@@ -94,8 +84,8 @@ def route_query(query):
 
 # --------------------- Flask Setup ---------------------
 app = Flask(__name__)
+app.config['DEBUG'] = os.getenv("FLASK_DEBUG", "False").lower() == "true"
 
-# Route for answering queries
 @app.route('/ask', methods=['POST'])
 def ask_question():
     data = request.get_json()
@@ -110,5 +100,4 @@ def ask_question():
 
 # --------------------- Run the Flask App ---------------------
 if __name__ == '__main__':
-    # Run the Flask app on host 0.0.0.0 to make it publicly accessible
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    serve(app, host='0.0.0.0', port=5000)
