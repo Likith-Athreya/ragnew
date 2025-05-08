@@ -5,4 +5,5 @@ PyDictionary
 tqdm
 flask
 python-dotenv
-gunicorn
+waitress
+
